@@ -1,615 +1,881 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeActive - Bloqueador personalizado</title>
-    <style>
-        :root {
-            --bg: #0f0f0f;
-            --surface: #1a1a1a;
-            --border: #2a2a2a;
-            --text: #e0e0e0;
-            --text-secondary: #a0a0a0;
-            --accent: #c9a84c;
-            --accent-hover: #b8903a;
-            --danger: #c0392b;
-            --success: #27ae60;
-            --radius: 12px;
-            --font-serif: 'Georgia', 'Times New Roman', serif;
-            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SafeActive</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    :root {
+      --bg:       #0f0f0f;
+      --surface:  #1a1a1a;
+      --border:   #2a2a2a;
+      --text:     #e0e0e0;
+      --muted:    #a0a0a0;
+      --gold:     #c9a84c;
+      --gold-dim: #a07a30;
+      --red:      #c0392b;
+      --radius:   10px;
+      --max:      520px;
+    }
 
-        body {
-            font-family: var(--font-sans);
-            background-color: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1.6;
-            padding: 20px;
-        }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-        .container {
-            width: 100%;
-            max-width: 520px;
-            background: var(--surface);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            padding: 40px 32px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            position: relative;
-        }
+    /* ── Topbar ── */
+    #topbar {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 10;
+    }
+    #topbar .logo {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--gold);
+      letter-spacing: 0.04em;
+    }
+    #topbar .logo span { color: var(--muted); font-weight: normal; }
+    #btn-signout {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      padding: 5px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: Georgia, serif;
+      transition: border-color .2s, color .2s;
+    }
+    #btn-signout:hover { border-color: var(--gold-dim); color: var(--text); }
 
-        h1, h2, h3 {
-            font-family: var(--font-serif);
-            font-weight: normal;
-            color: var(--accent);
-            margin-bottom: 24px;
-            text-align: center;
-            letter-spacing: 0.5px;
-        }
+    /* ── Pages ── */
+    .page { display: none; width: 100%; max-width: var(--max); padding: 40px 24px 60px; }
+    .page.active { display: block; }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+    /* ── Auth ── */
+    #page-auth { margin: 0 auto; }
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .auth-logo h1 {
+      font-family: Georgia, serif;
+      font-size: 32px;
+      color: var(--gold);
+      letter-spacing: 0.06em;
+    }
+    .auth-logo p { color: var(--muted); font-size: 13px; margin-top: 6px; }
 
-        label {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-family: var(--font-serif);
-        }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
 
-        input, textarea, select {
-            width: 100%;
-            padding: 12px 16px;
-            background: #0a0a0a;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 1rem;
-            font-family: var(--font-sans);
-            transition: border 0.2s;
-        }
+    .card h2 {
+      font-family: Georgia, serif;
+      font-size: 18px;
+      font-weight: normal;
+      color: var(--text);
+      margin-bottom: 22px;
+    }
 
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
 
-        button {
-            width: 100%;
-            padding: 14px;
-            background: var(--accent);
-            color: #0f0f0f;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: var(--font-serif);
-            letter-spacing: 0.3px;
-            transition: background 0.2s;
-            margin-top: 12px;
-        }
+    input[type="email"],
+    input[type="password"],
+    textarea,
+    select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color .2s;
+      font-family: inherit;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--gold-dim); }
+    input::placeholder, textarea::placeholder { color: #555; }
+    textarea { resize: vertical; min-height: 120px; }
+    select option { background: var(--surface); }
 
-        button.secondary {
-            background: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-        }
+    .field { margin-bottom: 16px; }
 
-        button:hover {
-            background: var(--accent-hover);
-        }
+    .btn-primary {
+      width: 100%;
+      background: var(--gold);
+      color: #0f0f0f;
+      border: none;
+      border-radius: 8px;
+      padding: 11px;
+      font-family: Georgia, serif;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      letter-spacing: 0.03em;
+      transition: background .2s, opacity .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary:hover { background: #d4b060; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        button.secondary:hover {
-            background: rgba(201, 168, 76, 0.1);
-        }
+    .btn-ghost {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-ghost:hover { border-color: var(--gold-dim); color: var(--text); }
 
-        .toggle-link {
-            text-align: center;
-            margin-top: 16px;
-            color: var(--accent);
-            cursor: pointer;
-            font-size: 0.9rem;
-            text-decoration: underline;
-            opacity: 0.8;
-        }
+    .auth-toggle {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .auth-toggle a { color: var(--gold); cursor: pointer; text-decoration: none; }
+    .auth-toggle a:hover { text-decoration: underline; }
 
-        .toggle-link:hover {
-            opacity: 1;
-        }
+    .error-msg {
+      background: rgba(192,57,43,.15);
+      border: 1px solid rgba(192,57,43,.4);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #e07060;
+      margin-bottom: 14px;
+    }
 
-        .hidden {
-            display: none !important;
-        }
+    /* ── Dashboard ── */
+    #page-dash { margin: 0 auto; }
+    .dash-header { margin-bottom: 28px; }
+    .dash-header h2 {
+      font-family: Georgia, serif;
+      font-size: 22px;
+      font-weight: normal;
+      color: var(--text);
+    }
+    .dash-header p { color: var(--muted); font-size: 13px; margin-top: 4px; }
 
-        .card {
-            background: #111;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
+    .type-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .type-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 16px;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color .2s, background .2s;
+      color: var(--text);
+    }
+    .type-btn:hover, .type-btn.active {
+      border-color: var(--gold-dim);
+      background: #1e1c14;
+    }
+    .type-btn .icon { font-size: 26px; display: block; margin-bottom: 8px; }
+    .type-btn .label {
+      font-family: Georgia, serif;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .type-btn .sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
 
-        .option-btn {
-            display: block;
-            width: 100%;
-            text-align: left;
-            background: transparent;
-            border: 1px solid var(--border);
-            margin-top: 8px;
-            padding: 14px;
-            color: var(--text);
-            font-family: var(--font-sans);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.2s;
-        }
+    #form-area { display: none; }
+    #form-area.visible { display: block; }
 
-        .option-btn:hover {
-            border-color: var(--accent);
-            background: rgba(201, 168, 76, 0.05);
-        }
+    /* file drop zone */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s;
+      position: relative;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--gold-dim); }
+    .drop-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .drop-zone .dz-icon { font-size: 28px; display: block; margin-bottom: 8px; }
+    .drop-zone .dz-text { color: var(--muted); font-size: 13px; }
+    .drop-zone .dz-chosen { color: var(--gold); font-size: 13px; font-weight: 500; }
 
-        .message {
-            background: #1e1e1e;
-            border-left: 3px solid var(--accent);
-            padding: 12px 16px;
-            margin: 16px 0;
-            border-radius: 4px;
-            color: var(--text-secondary);
-            font-style: italic;
-        }
+    .progress-bar {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 12px 0 0;
+      overflow: hidden;
+      display: none;
+    }
+    .progress-bar.visible { display: block; }
+    .progress-fill {
+      height: 100%;
+      background: var(--gold);
+      width: 0%;
+      transition: width .2s;
+    }
 
-        .link-box {
-            background: #000;
-            padding: 16px;
-            border-radius: 8px;
-            word-break: break-all;
-            color: var(--accent);
-            margin: 16px 0;
-            font-family: monospace;
-        }
+    /* spinner */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(0,0,0,.3);
+      border-top-color: #0f0f0f;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-        .logout {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            width: auto;
-            padding: 8px 16px;
-            margin: 0;
-        }
+    /* result box */
+    .result-box {
+      background: #141a0e;
+      border: 1px solid #3a4a20;
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+    }
+    .result-box.visible { display: block; }
+    .result-box .rb-label { font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+    .result-box .rb-link {
+      font-size: 13px;
+      color: var(--gold);
+      word-break: break-all;
+      display: block;
+      margin-bottom: 12px;
+    }
+    .result-box .rb-copy {
+      background: none;
+      border: 1px solid #3a4a20;
+      border-radius: 6px;
+      color: #a0c060;
+      font-size: 12px;
+      padding: 5px 14px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .2s;
+    }
+    .result-box .rb-copy:hover { background: rgba(100,160,40,.1); }
 
-        .spinner {
-            border: 4px solid var(--border);
-            border-top: 4px solid var(--accent);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 0.8s linear infinite;
-            margin: 20px auto;
-        }
+    /* ── Public page ── */
+    #page-public { margin: 0 auto; }
+    .pub-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px 28px;
+      text-align: center;
+    }
+    .lock-icon { font-size: 52px; display: block; margin-bottom: 18px; }
+    .pub-card h1 {
+      font-family: Georgia, serif;
+      font-size: 20px;
+      font-weight: normal;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .pub-card .pub-sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+    .countdown {
+      font-family: Georgia, serif;
+      font-size: 36px;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      margin: 8px 0 4px;
+    }
+    .unlock-at { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
+    .content-text {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px;
+      text-align: left;
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+      max-height: 340px;
+      overflow-y: auto;
+      margin: 16px 0;
+    }
+
+    .file-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--gold);
+      color: #0f0f0f;
+      padding: 11px 22px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-family: Georgia, serif;
+      font-size: 14px;
+      font-weight: bold;
+      margin-top: 16px;
+      transition: background .2s;
+    }
+    .file-download:hover { background: #d4b060; }
+
+    .pub-error { color: #e07060; font-size: 14px; margin-top: 12px; }
+
+    hr.sep {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 20px 0;
+    }
+
+    .permanent-badge {
+      display: inline-block;
+      background: rgba(201,168,76,.12);
+      border: 1px solid rgba(201,168,76,.3);
+      color: var(--gold);
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-top: 8px;
+      letter-spacing: .04em;
+    }
+
+    /* Loading overlay */
+    #loading-overlay {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      transition: opacity .4s;
+    }
+    #loading-overlay.hidden { opacity: 0; pointer-events: none; }
+    .loading-logo {
+      font-family: Georgia, serif;
+      font-size: 28px;
+      color: var(--gold);
+      letter-spacing: .08em;
+    }
+
+    @media (max-width: 480px) {
+      .type-grid { grid-template-columns: 1fr; }
+      .pub-card { padding: 28px 18px; }
+    }
+  </style>
 </head>
 <body>
-    <div id="app" class="container">
-        <!-- Contenido dinámico -->
+
+<!-- Loading -->
+<div id="loading-overlay"><div class="loading-logo">SafeActive</div></div>
+
+<!-- Topbar -->
+<div id="topbar" style="display:none">
+  <div class="logo">Safe<span>Active</span></div>
+  <button id="btn-signout">Cerrar sesión</button>
+</div>
+
+<!-- Auth -->
+<div id="page-auth" class="page">
+  <div class="auth-logo">
+    <h1>SafeActive</h1>
+    <p>Bloquea contenido. Controla el tiempo.</p>
+  </div>
+  <div class="card">
+    <h2 id="auth-title">Iniciar sesión</h2>
+    <div id="auth-error" class="error-msg" style="display:none"></div>
+    <div class="field"><label>Correo electrónico</label><input type="email" id="inp-email" placeholder="tu@correo.com" /></div>
+    <div class="field"><label>Contraseña</label><input type="password" id="inp-pass" placeholder="••••••••" /></div>
+    <button class="btn-primary" id="btn-auth-submit">Iniciar sesión</button>
+    <div class="auth-toggle">
+      <span id="auth-toggle-text">¿No tienes cuenta?</span>
+      <a id="auth-toggle-link">Crear cuenta</a>
     </div>
+  </div>
+</div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { 
-            getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            onAuthStateChanged, 
-            signOut 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            doc, 
-            getDoc, 
-            setDoc,
-            Timestamp,
-            serverTimestamp 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { 
-            getStorage, 
-            ref, 
-            uploadBytes, 
-            getDownloadURL 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+<!-- Dashboard -->
+<div id="page-dash" class="page">
+  <div class="dash-header">
+    <h2>Nuevo bloqueo</h2>
+    <p>Elige qué tipo de contenido deseas proteger.</p>
+  </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyD13N4-9MjTrmlPwGP7mves0Exje4v2ACw",
-            authDomain: "kahoot-8529e.firebaseapp.com",
-            databaseURL: "https://kahoot-8529e-default-rtdb.firebaseio.com",
-            projectId: "kahoot-8529e",
-            storageBucket: "kahoot-8529e.firebasestorage.app",
-            messagingSenderId: "313414356056",
-            appId: "1:313414356056:web:4aab4587f7df9393008e2d",
-            measurementId: "G-8T4CPC1BQ3"
-        };
+  <div class="type-grid">
+    <div class="type-btn" id="type-file" onclick="selectType('file')">
+      <span class="icon">📁</span>
+      <div class="label">Archivo</div>
+      <div class="sub">Imagen, PDF, video…</div>
+    </div>
+    <div class="type-btn" id="type-text" onclick="selectType('text')">
+      <span class="icon">📝</span>
+      <div class="label">Texto</div>
+      <div class="sub">Mensaje, nota…</div>
+    </div>
+  </div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
+  <div id="form-area">
+    <div class="card">
+      <!-- File area -->
+      <div id="area-file" style="display:none">
+        <div class="field">
+          <label>Archivo</label>
+          <div class="drop-zone" id="drop-zone">
+            <input type="file" id="inp-file" />
+            <span class="dz-icon">☁️</span>
+            <div class="dz-text" id="dz-text">Haz clic o arrastra un archivo aquí</div>
+          </div>
+          <div class="progress-bar" id="prog-bar"><div class="progress-fill" id="prog-fill"></div></div>
+        </div>
+      </div>
 
-        const appContainer = document.getElementById('app');
+      <!-- Text area -->
+      <div id="area-text" style="display:none">
+        <div class="field">
+          <label>Contenido</label>
+          <textarea id="inp-text" placeholder="Escribe el contenido que deseas bloquear…"></textarea>
+        </div>
+      </div>
 
-        function render(html) {
-            appContainer.innerHTML = html;
-        }
+      <!-- Duration -->
+      <div class="field">
+        <label>Duración del bloqueo</label>
+        <select id="inp-duration">
+          <option value="forever">Para siempre</option>
+          <option value="10">10 minutos</option>
+          <option value="60">1 hora</option>
+          <option value="120">2 horas</option>
+          <option value="360">6 horas</option>
+          <option value="720">12 horas</option>
+          <option value="1440">1 día</option>
+          <option value="custom">Personalizado…</option>
+        </select>
+      </div>
+      <div class="field" id="custom-min-field" style="display:none">
+        <label>Minutos personalizados</label>
+        <input type="number" id="inp-custom-min" placeholder="ej. 30" min="1" />
+      </div>
 
-        // --- VISTAS ---
-        function showAuth() {
-            render(`
-                <h1>SafeActive</h1>
-                <div id="auth-form">
-                    <div class="form-group">
-                        <label>Correo electrónico</label>
-                        <input type="email" id="email" placeholder="tu@email.com" autocomplete="email">
-                    </div>
-                    <div class="form-group">
-                        <label>Contraseña</label>
-                        <input type="password" id="password" placeholder="********" autocomplete="current-password">
-                    </div>
-                    <button id="login-btn">Iniciar sesión</button>
-                    <p class="toggle-link" id="toggle-register">¿No tienes cuenta? Crear una</p>
-                </div>
-                <div id="reg-form" class="hidden">
-                    <div class="form-group">
-                        <label>Correo electrónico</label>
-                        <input type="email" id="reg-email" placeholder="tu@email.com" autocomplete="email">
-                    </div>
-                    <div class="form-group">
-                        <label>Contraseña</label>
-                        <input type="password" id="reg-password" placeholder="********" autocomplete="new-password">
-                    </div>
-                    <button id="register-btn">Crear cuenta</button>
-                    <p class="toggle-link" id="toggle-login">Ya tengo cuenta, iniciar sesión</p>
-                </div>
-                <div id="auth-error" class="message hidden"></div>
-            `);
+      <div id="create-error" class="error-msg" style="display:none"></div>
+      <button class="btn-primary" id="btn-create">Crear bloqueo</button>
 
-            document.getElementById('toggle-register').addEventListener('click', () => {
-                document.getElementById('auth-form').classList.add('hidden');
-                document.getElementById('reg-form').classList.remove('hidden');
-            });
-            document.getElementById('toggle-login').addEventListener('click', () => {
-                document.getElementById('reg-form').classList.add('hidden');
-                document.getElementById('auth-form').classList.remove('hidden');
-            });
+      <div class="result-box" id="result-box">
+        <div class="rb-label">Enlace generado</div>
+        <a class="rb-link" id="rb-link" href="#" target="_blank"></a>
+        <button class="rb-copy" id="rb-copy">Copiar enlace</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-            document.getElementById('login-btn').addEventListener('click', login);
-            document.getElementById('register-btn').addEventListener('click', register);
-        }
+<!-- Public view -->
+<div id="page-public" class="page">
+  <div style="text-align:center; margin-bottom: 20px;">
+    <div class="loading-logo" style="font-size:20px">SafeActive</div>
+  </div>
+  <div class="pub-card" id="pub-card">
+    <span class="lock-icon">🔒</span>
+    <h1 id="pub-title">Cargando…</h1>
+    <p class="pub-sub" id="pub-sub"></p>
+    <div id="pub-countdown-wrap" style="display:none">
+      <div class="countdown" id="pub-countdown">--:--:--</div>
+      <div class="unlock-at" id="pub-unlock-at"></div>
+    </div>
+    <div id="pub-content" style="display:none"></div>
+  </div>
+</div>
 
-        async function login() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('auth-error');
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                errorDiv.textContent = error.message;
-                errorDiv.classList.remove('hidden');
-            }
-        }
+<!-- Firebase v10 -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp, Timestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
 
-        async function register() {
-            const email = document.getElementById('reg-email').value.trim();
-            const password = document.getElementById('reg-password').value;
-            const errorDiv = document.getElementById('auth-error');
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                errorDiv.textContent = error.message;
-                errorDiv.classList.remove('hidden');
-            }
-        }
+// ── Firebase config ──────────────────────────────────────────────────────────
+// TODO: Replace with your Firebase project credentials
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
 
-        function showDashboard() {
-            render(`
-                <button id="logout-btn" class="logout">Cerrar sesión</button>
-                <h1>SafeActive</h1>
-                <p style="text-align:center; color: var(--text-secondary); margin-bottom: 32px;">Tu bloqueador personalizado</p>
-                <div class="card">
-                    <p style="margin-bottom:12px; color: var(--text-secondary);">¿Qué quieres bloquear?</p>
-                    <button id="add-file-btn" class="option-btn">📁 Añadir archivo</button>
-                    <button id="add-text-btn" class="option-btn">📝 Añadir texto</button>
-                </div>
-            `);
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+const storage = getStorage(app);
 
-            document.getElementById('logout-btn').addEventListener('click', async () => {
-                await signOut(auth);
-            });
-            document.getElementById('add-file-btn').addEventListener('click', () => showCreateBlock('file'));
-            document.getElementById('add-text-btn').addEventListener('click', () => showCreateBlock('text'));
-        }
+// ── Routing ──────────────────────────────────────────────────────────────────
+function getRoute() {
+  const path = window.location.pathname;
+  const m = path.match(/^\/safeactive\/([^/]+)\/official$/);
+  return m ? { type: 'public', id: m[1] } : { type: 'app' };
+}
 
-        function showCreateBlock(type) {
-            const title = type === 'file' ? 'Bloquear archivo' : 'Bloquear texto';
-            render(`
-                <button id="back-btn" class="logout" style="left:20px; right:auto;">← Volver</button>
-                <h1>${title}</h1>
-                <div id="create-form">
-                    ${type === 'file' ? `
-                        <div class="form-group">
-                            <label>Selecciona un archivo</label>
-                            <input type="file" id="file-input">
-                        </div>
-                    ` : `
-                        <div class="form-group">
-                            <label>Texto a bloquear</label>
-                            <textarea id="text-input" rows="4" placeholder="Escribe el contenido que quieres bloquear..."></textarea>
-                        </div>
-                    `}
-                    <div class="form-group">
-                        <label>Duración del bloqueo</label>
-                        <select id="duration-select">
-                            <option value="forever">Para siempre</option>
-                            <option value="10min">10 minutos</option>
-                            <option value="1hour">1 hora</option>
-                            <option value="2hours">2 horas</option>
-                            <option value="6hours">6 horas</option>
-                            <option value="12hours">12 horas</option>
-                            <option value="1day">1 día</option>
-                            <option value="custom">Personalizado (minutos)</option>
-                        </select>
-                    </div>
-                    <div id="custom-duration-group" class="form-group hidden">
-                        <label>Minutos</label>
-                        <input type="number" id="custom-minutes" min="1" placeholder="Ej: 45">
-                    </div>
-                    <button id="create-block-btn">Crear bloqueo</button>
-                    <div id="create-error" class="message hidden"></div>
-                </div>
-                <div id="loading-section" class="hidden" style="text-align:center;">
-                    <p>Creando enlace seguro...</p>
-                    <div class="spinner"></div>
-                </div>
-                <div id="result-section" class="hidden">
-                    <h3>Enlace generado</h3>
-                    <div class="link-box" id="generated-link"></div>
-                    <button id="copy-btn" class="secondary">Copiar enlace</button>
-                    <button id="new-block-btn">Crear otro bloqueo</button>
-                </div>
-            `);
+const route = getRoute();
+const overlay = document.getElementById('loading-overlay');
 
-            document.getElementById('back-btn').addEventListener('click', showDashboard);
+// ── Auth state ───────────────────────────────────────────────────────────────
+onAuthStateChanged(auth, user => {
+  overlay.classList.add('hidden');
+  setTimeout(() => overlay.style.display = 'none', 400);
 
-            const durationSelect = document.getElementById('duration-select');
-            const customGroup = document.getElementById('custom-duration-group');
-            durationSelect.addEventListener('change', () => {
-                customGroup.classList.toggle('hidden', durationSelect.value !== 'custom');
-            });
+  if (route.type === 'public') {
+    showPage('page-public');
+    loadPublicBlock(route.id);
+    return;
+  }
 
-            document.getElementById('create-block-btn').addEventListener('click', () => handleCreateBlock(type));
-        }
+  if (user) {
+    document.getElementById('topbar').style.display = 'flex';
+    showPage('page-dash');
+  } else {
+    document.getElementById('topbar').style.display = 'none';
+    showPage('page-auth');
+  }
+});
 
-        async function handleCreateBlock(type) {
-            const errorDiv = document.getElementById('create-error');
-            errorDiv.classList.add('hidden');
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
 
-            let file = null;
-            let text = '';
-            if (type === 'file') {
-                const fileInput = document.getElementById('file-input');
-                file = fileInput.files[0];
-                if (!file) {
-                    errorDiv.textContent = 'Por favor selecciona un archivo.';
-                    errorDiv.classList.remove('hidden');
-                    return;
-                }
-            } else {
-                text = document.getElementById('text-input').value.trim();
-                if (!text) {
-                    errorDiv.textContent = 'Por favor escribe un texto.';
-                    errorDiv.classList.remove('hidden');
-                    return;
-                }
-            }
+// ── Auth UI ──────────────────────────────────────────────────────────────────
+let authMode = 'login'; // 'login' | 'register'
 
-            // Calcular unlockAt
-            const durationVal = document.getElementById('duration-select').value;
-            let unlockAt = null;
-            if (durationVal !== 'forever') {
-                let minutes = 0;
-                switch (durationVal) {
-                    case '10min': minutes = 10; break;
-                    case '1hour': minutes = 60; break;
-                    case '2hours': minutes = 120; break;
-                    case '6hours': minutes = 360; break;
-                    case '12hours': minutes = 720; break;
-                    case '1day': minutes = 1440; break;
-                    case 'custom':
-                        const customMin = parseInt(document.getElementById('custom-minutes').value, 10);
-                        if (isNaN(customMin) || customMin < 1) {
-                            errorDiv.textContent = 'Introduce un número válido de minutos.';
-                            errorDiv.classList.remove('hidden');
-                            return;
-                        }
-                        minutes = customMin;
-                        break;
-                }
-                unlockAt = Timestamp.fromDate(new Date(Date.now() + minutes * 60 * 1000));
-            }
+document.getElementById('auth-toggle-link').addEventListener('click', () => {
+  authMode = authMode === 'login' ? 'register' : 'login';
+  document.getElementById('auth-title').textContent =
+    authMode === 'login' ? 'Iniciar sesión' : 'Crear cuenta';
+  document.getElementById('btn-auth-submit').textContent =
+    authMode === 'login' ? 'Iniciar sesión' : 'Crear cuenta';
+  document.getElementById('auth-toggle-text').textContent =
+    authMode === 'login' ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?';
+  document.getElementById('auth-toggle-link').textContent =
+    authMode === 'login' ? 'Crear cuenta' : 'Iniciar sesión';
+  document.getElementById('auth-error').style.display = 'none';
+});
 
-            // Mostrar loading
-            document.getElementById('create-form').classList.add('hidden');
-            document.getElementById('loading-section').classList.remove('hidden');
+document.getElementById('btn-auth-submit').addEventListener('click', async () => {
+  const email = document.getElementById('inp-email').value.trim();
+  const pass  = document.getElementById('inp-pass').value;
+  const errEl = document.getElementById('auth-error');
+  const btn   = document.getElementById('btn-auth-submit');
+  errEl.style.display = 'none';
+  if (!email || !pass) { showError(errEl, 'Completa todos los campos.'); return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    if (authMode === 'login') {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } else {
+      await createUserWithEmailAndPassword(auth, email, pass);
+    }
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = authMode === 'login' ? 'Iniciar sesión' : 'Crear cuenta';
+    showError(errEl, friendlyAuthError(e.code));
+  }
+});
 
-            try {
-                // 1. Crear documento base
-                const blockData = {
-                    type,
-                    owner: auth.currentUser.uid,
-                    unlockAt: unlockAt,
-                    createdAt: serverTimestamp()
-                };
-                const docRef = await addDoc(collection(db, 'blocks'), blockData);
-                const blockId = docRef.id;
+['inp-email','inp-pass'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('btn-auth-submit').click();
+  });
+});
 
-                // 2. Guardar contenido
-                if (type === 'file') {
-                    const storageRef = ref(storage, `blocks/${blockId}/${file.name}`);
-                    await uploadBytes(storageRef, file);
-                    const downloadURL = await getDownloadURL(storageRef);
-                    await setDoc(docRef, {
-                        contentUrl: downloadURL,
-                        fileName: file.name
-                    }, { merge: true });
-                } else {
-                    await setDoc(docRef, {
-                        contentText: text
-                    }, { merge: true });
-                }
+document.getElementById('btn-signout').addEventListener('click', () => signOut(auth));
 
-                // 3. Éxito inmediato: mostrar enlace
-                document.getElementById('loading-section').classList.add('hidden');
-                const resultSection = document.getElementById('result-section');
-                resultSection.classList.remove('hidden');
-                const link = `${window.location.origin}/safeactive/${blockId}/official`;
-                document.getElementById('generated-link').textContent = link;
+function friendlyAuthError(code) {
+  const map = {
+    'auth/invalid-email': 'Correo electrónico inválido.',
+    'auth/user-not-found': 'No existe una cuenta con ese correo.',
+    'auth/wrong-password': 'Contraseña incorrecta.',
+    'auth/email-already-in-use': 'Ese correo ya tiene una cuenta.',
+    'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
+    'auth/invalid-credential': 'Credenciales incorrectas.',
+    'auth/too-many-requests': 'Demasiados intentos. Espera un momento.',
+  };
+  return map[code] || 'Error al autenticar. Inténtalo de nuevo.';
+}
 
-                document.getElementById('copy-btn').onclick = () => {
-                    navigator.clipboard.writeText(link);
-                    alert('Enlace copiado al portapapeles');
-                };
-                document.getElementById('new-block-btn').onclick = showDashboard;
+function showError(el, msg) { el.textContent = msg; el.style.display = 'block'; }
 
-            } catch (error) {
-                // Error: mostrar mensaje y volver al formulario
-                document.getElementById('loading-section').classList.add('hidden');
-                document.getElementById('create-form').classList.remove('hidden');
-                errorDiv.textContent = 'Error: ' + error.message;
-                errorDiv.classList.remove('hidden');
-            }
-        }
+// ── Dashboard ────────────────────────────────────────────────────────────────
+let selectedType = null;
 
-        // Página pública de bloqueo
-        async function showBlockView(blockId) {
-            render(`
-                <h1>SafeActive</h1>
-                <div id="block-content">
-                    <p style="text-align:center">Cargando...</p>
-                </div>
-            `);
+window.selectType = function(type) {
+  selectedType = type;
+  document.getElementById('type-file').classList.toggle('active', type === 'file');
+  document.getElementById('type-text').classList.toggle('active', type === 'text');
+  document.getElementById('form-area').classList.add('visible');
+  document.getElementById('area-file').style.display = type === 'file' ? 'block' : 'none';
+  document.getElementById('area-text').style.display = type === 'text' ? 'block' : 'none';
+  document.getElementById('result-box').classList.remove('visible');
+  document.getElementById('create-error').style.display = 'none';
+};
 
-            try {
-                const blockDoc = await getDoc(doc(db, 'blocks', blockId));
-                if (!blockDoc.exists()) {
-                    render(`<h1>SafeActive</h1><div class="message">Este enlace no es válido o el bloqueo ha sido eliminado.</div>`);
-                    return;
-                }
+// File input display
+document.getElementById('inp-file').addEventListener('change', function() {
+  const f = this.files[0];
+  if (f) document.getElementById('dz-text').textContent = f.name;
+});
 
-                const data = blockDoc.data();
-                const now = Timestamp.now();
-                const isLocked = data.unlockAt === null || data.unlockAt > now;
-                let unlockTimeStr = '';
-                if (data.unlockAt) {
-                    unlockTimeStr = data.unlockAt.toDate().toLocaleString();
-                }
+// Drag over
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) {
+    const dt = new DataTransfer(); dt.items.add(f);
+    document.getElementById('inp-file').files = dt.files;
+    document.getElementById('dz-text').textContent = f.name;
+  }
+});
 
-                if (isLocked) {
-                    render(`
-                        <h1>SafeActive</h1>
-                        <div style="text-align:center; margin: 40px 0;">
-                            <div style="font-size: 3rem; margin-bottom: 20px;">🔒</div>
-                            <h2>Contenido bloqueado</h2>
-                            <p class="message">Este archivo o texto está protegido por un bloqueo temporal.</p>
-                            ${data.unlockAt === null ? 
-                                '<p>Este bloqueo es <strong>permanente</strong> y nunca se desbloqueará.</p>' :
-                                `<p>Se desbloqueará el <strong>${unlockTimeStr}</strong></p>
-                                 <div class="timer" id="countdown" style="font-size:2rem;margin-top:20px;"></div>`
-                            }
-                        </div>
-                    `);
+// Duration selector
+document.getElementById('inp-duration').addEventListener('change', function() {
+  document.getElementById('custom-min-field').style.display =
+    this.value === 'custom' ? 'block' : 'none';
+});
 
-                    if (data.unlockAt) {
-                        const unlockDate = data.unlockAt.toDate();
-                        const timerEl = document.getElementById('countdown');
-                        function updateTimer() {
-                            const now = new Date();
-                            const diff = unlockDate - now;
-                            if (diff <= 0) {
-                                timerEl.textContent = '¡Desbloqueado!';
-                                location.reload();
-                                return;
-                            }
-                            const h = Math.floor(diff / 3600000);
-                            const m = Math.floor((diff % 3600000) / 60000);
-                            const s = Math.floor((diff % 60000) / 1000);
-                            timerEl.textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                        }
-                        updateTimer();
-                        setInterval(updateTimer, 1000);
-                    }
-                } else {
-                    if (data.type === 'file') {
-                        render(`
-                            <h1>SafeActive</h1>
-                            <div style="text-align:center;">
-                                <p>El archivo ha sido desbloqueado.</p>
-                                <p><strong>${data.fileName || 'Archivo'}</strong></p>
-                                <a href="${data.contentUrl}" download class="option-btn" style="display:inline-block; width:auto; margin-top:20px;">📥 Descargar archivo</a>
-                            </div>
-                        `);
-                    } else {
-                        render(`
-                            <h1>SafeActive</h1>
-                            <div class="card">
-                                <p style="white-space:pre-wrap;">${data.contentText}</p>
-                            </div>
-                        `);
-                    }
-                }
-            } catch (error) {
-                render(`<h1>SafeActive</h1><div class="message">Error al cargar: ${error.message}</div>`);
-            }
-        }
+// Create block
+document.getElementById('btn-create').addEventListener('click', async () => {
+  const errEl = document.getElementById('create-error');
+  errEl.style.display = 'none';
 
-        // Router
-        function handleRoute() {
-            const path = window.location.pathname;
-            const match = path.match(/^\/safeactive\/([^/]+)\/official$/);
-            if (match) {
-                showBlockView(match[1]);
-            } else {
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        showDashboard();
-                    } else {
-                        showAuth();
-                    }
-                });
-            }
-        }
+  if (!selectedType) { showError(errEl, 'Selecciona un tipo de contenido.'); return; }
 
-        handleRoute();
-    </script>
+  const durVal = document.getElementById('inp-duration').value;
+  let unlockAt = null;
+  if (durVal !== 'forever') {
+    const mins = durVal === 'custom'
+      ? parseInt(document.getElementById('inp-custom-min').value)
+      : parseInt(durVal);
+    if (!mins || mins < 1) { showError(errEl, 'Ingresa una duración válida.'); return; }
+    unlockAt = Timestamp.fromDate(new Date(Date.now() + mins * 60000));
+  }
+
+  const btn = document.getElementById('btn-create');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+
+  try {
+    const user = auth.currentUser;
+    const blockId = generateId();
+
+    if (selectedType === 'text') {
+      const text = document.getElementById('inp-text').value.trim();
+      if (!text) throw new Error('Escribe algún contenido.');
+      await setDoc(doc(db, 'blocks', blockId), {
+        type: 'text',
+        owner: user.uid,
+        unlockAt,
+        createdAt: serverTimestamp(),
+        contentText: text
+      });
+    } else {
+      const file = document.getElementById('inp-file').files[0];
+      if (!file) throw new Error('Selecciona un archivo.');
+      const url = await uploadFile(blockId, file);
+      await setDoc(doc(db, 'blocks', blockId), {
+        type: 'file',
+        owner: user.uid,
+        unlockAt,
+        createdAt: serverTimestamp(),
+        contentUrl: url,
+        fileName: file.name
+      });
+    }
+
+    const link = `${window.location.origin}/safeactive/${blockId}/official`;
+    const rb = document.getElementById('result-box');
+    const rbLink = document.getElementById('rb-link');
+    rbLink.textContent = link;
+    rbLink.href = link;
+    rb.classList.add('visible');
+
+  } catch(e) {
+    showError(errEl, e.message || 'Error al crear el bloqueo.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Crear bloqueo';
+  }
+});
+
+document.getElementById('rb-copy').addEventListener('click', () => {
+  const link = document.getElementById('rb-link').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.getElementById('rb-copy');
+    btn.textContent = '¡Copiado!';
+    setTimeout(() => btn.textContent = 'Copiar enlace', 2000);
+  });
+});
+
+async function uploadFile(blockId, file) {
+  return new Promise((resolve, reject) => {
+    const ref = storageRef(storage, `blocks/${blockId}/${file.name}`);
+    const task = uploadBytesResumable(ref, file);
+    const prog = document.getElementById('prog-bar');
+    const fill = document.getElementById('prog-fill');
+    prog.classList.add('visible');
+    task.on('state_changed',
+      snap => { fill.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + '%'; },
+      reject,
+      async () => { resolve(await getDownloadURL(task.snapshot.ref)); prog.classList.remove('visible'); }
+    );
+  });
+}
+
+function generateId() {
+  return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+}
+
+// ── Public block page ────────────────────────────────────────────────────────
+let countdownInterval = null;
+
+async function loadPublicBlock(id) {
+  const titleEl    = document.getElementById('pub-title');
+  const subEl      = document.getElementById('pub-sub');
+  const cdWrap     = document.getElementById('pub-countdown-wrap');
+  const cdEl       = document.getElementById('pub-countdown');
+  const unlockAtEl = document.getElementById('pub-unlock-at');
+  const contentEl  = document.getElementById('pub-content');
+  const lockIcon   = document.querySelector('.lock-icon');
+
+  try {
+    const snap = await getDoc(doc(db, 'blocks', id));
+    if (!snap.exists()) {
+      lockIcon.textContent = '⚠️';
+      titleEl.textContent = 'Bloqueo no encontrado';
+      subEl.textContent = 'Este enlace no existe o ha sido eliminado.';
+      return;
+    }
+
+    const data = snap.data();
+    const isForever = !data.unlockAt;
+    const unlockDate = isForever ? null : data.unlockAt.toDate();
+    const now = new Date();
+    const isLocked = isForever || unlockDate > now;
+
+    if (isLocked) {
+      lockIcon.textContent = '🔒';
+      titleEl.textContent = 'Contenido bloqueado';
+      if (isForever) {
+        subEl.textContent = 'Este bloqueo es permanente y nunca se desbloqueará.';
+        const badge = document.createElement('div');
+        badge.className = 'permanent-badge';
+        badge.textContent = '🔒 Permanente';
+        document.getElementById('pub-card').appendChild(badge);
+      } else {
+        subEl.textContent = 'Este contenido está protegido hasta:';
+        cdWrap.style.display = 'block';
+        unlockAtEl.textContent = formatDate(unlockDate);
+        startCountdown(unlockDate, cdEl);
+      }
+    } else {
+      // Unlocked
+      lockIcon.textContent = '🔓';
+      titleEl.textContent = 'Contenido disponible';
+      subEl.textContent = 'El período de bloqueo ha finalizado.';
+
+      contentEl.style.display = 'block';
+      if (data.type === 'text') {
+        const box = document.createElement('div');
+        box.className = 'content-text';
+        box.textContent = data.contentText;
+        contentEl.appendChild(box);
+      } else {
+        const a = document.createElement('a');
+        a.className = 'file-download';
+        a.href = data.contentUrl;
+        a.download = data.fileName || 'archivo';
+        a.target = '_blank';
+        a.innerHTML = `📥 Descargar ${data.fileName || 'archivo'}`;
+        contentEl.appendChild(a);
+      }
+    }
+  } catch(e) {
+    lockIcon.textContent = '⚠️';
+    titleEl.textContent = 'Error al cargar';
+    subEl.textContent = e.message;
+  }
+}
+
+function startCountdown(target, el) {
+  if (countdownInterval) clearInterval(countdownInterval);
+  function tick() {
+    const diff = target - new Date();
+    if (diff <= 0) {
+      clearInterval(countdownInterval);
+      window.location.reload();
+      return;
+    }
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+  }
+  tick();
+  countdownInterval = setInterval(tick, 1000);
+}
+
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function formatDate(d) {
+  return d.toLocaleString('es-ES', {
+    year: 'numeric', month: 'long', day: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+</script>
 </body>
 </html>
