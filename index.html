@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeActive - Bloqueador personalizado</title>
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --surface: #1a1a1a;
+            --border: #2a2a2a;
+            --text: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent: #c9a84c;
+            --accent-hover: #b8903a;
+            --danger: #c0392b;
+            --success: #27ae60;
+            --radius: 12px;
+            --font-serif: 'Georgia', 'Times New Roman', serif;
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 40px 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        h1, h2, h3 {
+            font-family: var(--font-serif);
+            font-weight: normal;
+            color: var(--accent);
+            margin-bottom: 24px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-family: var(--font-serif);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0a0a0a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            font-family: var(--font-sans);
+            transition: border 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            color: #0f0f0f;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-serif);
+            letter-spacing: 0.3px;
+            transition: background 0.2s;
+            margin-top: 12px;
+        }
+
+        button.secondary {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+        }
+
+        button.secondary:hover {
+            background: rgba(201, 168, 76, 0.1);
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 16px;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+            opacity: 0.8;
+        }
+
+        .toggle-link:hover {
+            opacity: 1;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 28px 0;
+        }
+
+        .card {
+            background: #111;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border: 1px solid var(--border);
+            margin-top: 8px;
+            padding: 14px;
+            color: var(--text);
+            font-family: var(--font-sans);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--accent);
+            background: rgba(201, 168, 76, 0.05);
+        }
+
+        .timer {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--accent);
+        }
+
+        .message {
+            background: #1e1e1e;
+            border-left: 3px solid var(--accent);
+            padding: 12px 16px;
+            margin: 16px 0;
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .link-box {
+            background: #000;
+            padding: 16px;
+            border-radius: 8px;
+            word-break: break-all;
+            color: var(--accent);
+            margin: 16px 0;
+            font-family: monospace;
+        }
+
+        .logout {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            width: auto;
+            padding: 8px 16px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <!-- Se llenará dinámicamente -->
+    </div>
+
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            doc, 
+            getDoc, 
+            Timestamp,
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { 
+            getStorage, 
+            ref, 
+            uploadBytes, 
+            getDownloadURL 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        // Configuración de Firebase (proporcionada por ti)
+        const firebaseConfig = {
+            apiKey: "AIzaSyD13N4-9MjTrmlPwGP7mves0Exje4v2ACw",
+            authDomain: "kahoot-8529e.firebaseapp.com",
+            databaseURL: "https://kahoot-8529e-default-rtdb.firebaseio.com",
+            projectId: "kahoot-8529e",
+            storageBucket: "kahoot-8529e.firebasestorage.app",
+            messagingSenderId: "313414356056",
+            appId: "1:313414356056:web:4aab4587f7df9393008e2d",
+            measurementId: "G-8T4CPC1BQ3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // --- RUTEO SIMPLE ---
+        const appContainer = document.getElementById('app');
+
+        // Función para renderizar una plantilla HTML en el contenedor
+        function render(html) {
+            appContainer.innerHTML = html;
+        }
+
+        // --- VISTAS ---
+        function showAuth() {
+            render(`
+                <h1>SafeActive</h1>
+                <div id="auth-form">
+                    <div class="form-group">
+                        <label>Correo electrónico</label>
+                        <input type="email" id="email" placeholder="tu@email.com" autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="password" id="password" placeholder="********" autocomplete="current-password">
+                    </div>
+                    <button id="login-btn">Iniciar sesión</button>
+                    <p class="toggle-link" id="toggle-register">¿No tienes cuenta? Crear una</p>
+                </div>
+                <div id="reg-form" class="hidden">
+                    <div class="form-group">
+                        <label>Correo electrónico</label>
+                        <input type="email" id="reg-email" placeholder="tu@email.com" autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="password" id="reg-password" placeholder="********" autocomplete="new-password">
+                    </div>
+                    <button id="register-btn">Crear cuenta</button>
+                    <p class="toggle-link" id="toggle-login">Ya tengo cuenta, iniciar sesión</p>
+                </div>
+                <div id="auth-error" class="message hidden"></div>
+            `);
+
+            // Mostrar/ocultar formularios
+            document.getElementById('toggle-register').addEventListener('click', () => {
+                document.getElementById('auth-form').classList.add('hidden');
+                document.getElementById('reg-form').classList.remove('hidden');
+            });
+            document.getElementById('toggle-login').addEventListener('click', () => {
+                document.getElementById('reg-form').classList.add('hidden');
+                document.getElementById('auth-form').classList.remove('hidden');
+            });
+
+            // Eventos
+            document.getElementById('login-btn').addEventListener('click', login);
+            document.getElementById('register-btn').addEventListener('click', register);
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('auth-error');
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged se encargará de mostrar dashboard
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        async function register() {
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const errorDiv = document.getElementById('auth-error');
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged se encargará de mostrar dashboard
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function showDashboard() {
+            render(`
+                <button id="logout-btn" class="logout">Cerrar sesión</button>
+                <h1>SafeActive</h1>
+                <p style="text-align:center; color: var(--text-secondary); margin-bottom: 32px;">Tu bloqueador personalizado</p>
+                <div class="card">
+                    <p style="margin-bottom:12px; color: var(--text-secondary);">¿Qué quieres bloquear?</p>
+                    <button id="add-file-btn" class="option-btn">📁 Añadir archivo</button>
+                    <button id="add-text-btn" class="option-btn">📝 Añadir texto</button>
+                </div>
+            `);
+
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                await signOut(auth);
+            });
+            document.getElementById('add-file-btn').addEventListener('click', () => showCreateBlock('file'));
+            document.getElementById('add-text-btn').addEventListener('click', () => showCreateBlock('text'));
+        }
+
+        function showCreateBlock(type) {
+            const title = type === 'file' ? 'Bloquear archivo' : 'Bloquear texto';
+            render(`
+                <button id="back-btn" class="logout" style="left:20px; right:auto;">← Volver</button>
+                <h1>${title}</h1>
+                <div id="create-form">
+                    ${type === 'file' ? `
+                        <div class="form-group">
+                            <label>Selecciona un archivo</label>
+                            <input type="file" id="file-input">
+                        </div>
+                    ` : `
+                        <div class="form-group">
+                            <label>Texto a bloquear</label>
+                            <textarea id="text-input" rows="4" placeholder="Escribe el contenido que quieres bloquear..."></textarea>
+                        </div>
+                    `}
+                    <div class="form-group">
+                        <label>Duración del bloqueo</label>
+                        <select id="duration-select">
+                            <option value="forever">Para siempre</option>
+                            <option value="10min">10 minutos</option>
+                            <option value="1hour">1 hora</option>
+                            <option value="2hours">2 horas</option>
+                            <option value="6hours">6 horas</option>
+                            <option value="12hours">12 horas</option>
+                            <option value="1day">1 día</option>
+                            <option value="custom">Personalizado (minutos)</option>
+                        </select>
+                    </div>
+                    <div id="custom-duration-group" class="form-group hidden">
+                        <label>Minutos</label>
+                        <input type="number" id="custom-minutes" min="1" placeholder="Ej: 45">
+                    </div>
+                    <button id="create-block-btn">Crear bloqueo</button>
+                    <div id="create-error" class="message hidden"></div>
+                </div>
+                <div id="loading-section" class="hidden" style="text-align:center;">
+                    <p>Creando enlace seguro...</p>
+                    <div class="timer" id="countdown-timer">5</div>
+                </div>
+                <div id="result-section" class="hidden">
+                    <h3>Enlace generado</h3>
+                    <div class="link-box" id="generated-link"></div>
+                    <button id="copy-btn" class="secondary">Copiar enlace</button>
+                    <button id="new-block-btn">Crear otro bloqueo</button>
+                </div>
+            `);
+
+            document.getElementById('back-btn').addEventListener('click', showDashboard);
+
+            const durationSelect = document.getElementById('duration-select');
+            const customGroup = document.getElementById('custom-duration-group');
+            durationSelect.addEventListener('change', () => {
+                if (durationSelect.value === 'custom') {
+                    customGroup.classList.remove('hidden');
+                } else {
+                    customGroup.classList.add('hidden');
+                }
+            });
+
+            document.getElementById('create-block-btn').addEventListener('click', () => handleCreateBlock(type));
+        }
+
+        async function handleCreateBlock(type) {
+            const errorDiv = document.getElementById('create-error');
+            errorDiv.classList.add('hidden');
+
+            let file = null;
+            let text = '';
+            if (type === 'file') {
+                const fileInput = document.getElementById('file-input');
+                file = fileInput.files[0];
+                if (!file) {
+                    errorDiv.textContent = 'Por favor selecciona un archivo.';
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
+            } else {
+                text = document.getElementById('text-input').value.trim();
+                if (!text) {
+                    errorDiv.textContent = 'Por favor escribe un texto.';
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
+            }
+
+            // Calcular unlockAt
+            const durationVal = document.getElementById('duration-select').value;
+            let unlockAt = null; // null = forever
+            if (durationVal !== 'forever') {
+                let minutes = 0;
+                switch (durationVal) {
+                    case '10min': minutes = 10; break;
+                    case '1hour': minutes = 60; break;
+                    case '2hours': minutes = 120; break;
+                    case '6hours': minutes = 360; break;
+                    case '12hours': minutes = 720; break;
+                    case '1day': minutes = 1440; break;
+                    case 'custom':
+                        const customMin = parseInt(document.getElementById('custom-minutes').value, 10);
+                        if (isNaN(customMin) || customMin < 1) {
+                            errorDiv.textContent = 'Introduce un número válido de minutos.';
+                            errorDiv.classList.remove('hidden');
+                            return;
+                        }
+                        minutes = customMin;
+                        break;
+                }
+                unlockAt = Timestamp.fromDate(new Date(Date.now() + minutes * 60 * 1000));
+            }
+
+            // Mostrar sección de carga
+            document.getElementById('create-form').classList.add('hidden');
+            const loadingSection = document.getElementById('loading-section');
+            loadingSection.classList.remove('hidden');
+
+            // Simular cuenta atrás de 5 segundos
+            let secondsLeft = 5;
+            const timerEl = document.getElementById('countdown-timer');
+            timerEl.textContent = secondsLeft;
+            const interval = setInterval(() => {
+                secondsLeft--;
+                timerEl.textContent = secondsLeft;
+                if (secondsLeft <= 0) {
+                    clearInterval(interval);
+                }
+            }, 1000);
+
+            try {
+                // 1. Crear documento en Firestore para obtener ID
+                const blockData = {
+                    type,
+                    owner: auth.currentUser.uid,
+                    unlockAt: unlockAt,
+                    createdAt: serverTimestamp()
+                };
+                const docRef = await addDoc(collection(db, 'blocks'), blockData);
+                const blockId = docRef.id;
+
+                // 2. Subir archivo si es tipo file
+                if (type === 'file') {
+                    const storageRef = ref(storage, `blocks/${blockId}/${file.name}`);
+                    await uploadBytes(storageRef, file);
+                    const downloadURL = await getDownloadURL(storageRef);
+                    await addDoc(collection(db, 'blocks'), { ...blockData, contentUrl: downloadURL, fileName: file.name }, { merge: false }); 
+                    // Mejor: actualizar el documento existente con updateDoc
+                    // Pero addDoc ya creó el doc. Usemos setDoc con merge: true.
+                    const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                    await setDoc(docRef, { contentUrl: downloadURL, fileName: file.name }, { merge: true });
+                } else {
+                    await setDoc(docRef, { contentText: text }, { merge: true });
+                }
+
+                // Esperar a que terminen los 5 segundos
+                await new Promise(resolve => setTimeout(resolve, Math.max(0, secondsLeft * 1000)));
+
+                // Mostrar resultado
+                loadingSection.classList.add('hidden');
+                const resultSection = document.getElementById('result-section');
+                resultSection.classList.remove('hidden');
+                const link = `${window.location.origin}/safeactive/${blockId}/official`;
+                document.getElementById('generated-link').textContent = link;
+
+                document.getElementById('copy-btn').addEventListener('click', () => {
+                    navigator.clipboard.writeText(link);
+                    alert('Enlace copiado al portapapeles');
+                });
+                document.getElementById('new-block-btn').addEventListener('click', showDashboard);
+
+            } catch (error) {
+                clearInterval(interval);
+                loadingSection.classList.add('hidden');
+                errorDiv.textContent = 'Error: ' + error.message;
+                errorDiv.classList.remove('hidden');
+                document.getElementById('create-form').classList.remove('hidden');
+            }
+        }
+
+        // Página pública de bloqueo
+        async function showBlockView(blockId) {
+            render(`
+                <h1>SafeActive</h1>
+                <div id="block-content">
+                    <p style="text-align:center">Cargando...</p>
+                </div>
+            `);
+
+            try {
+                const blockDoc = await getDoc(doc(db, 'blocks', blockId));
+                if (!blockDoc.exists()) {
+                    render(`<h1>SafeActive</h1><div class="message">Este enlace no es válido o el bloqueo ha sido eliminado.</div>`);
+                    return;
+                }
+
+                const data = blockDoc.data();
+                const now = Timestamp.now();
+                const isLocked = data.unlockAt === null || data.unlockAt > now;
+                let unlockTimeStr = '';
+                if (data.unlockAt) {
+                    unlockTimeStr = data.unlockAt.toDate().toLocaleString();
+                }
+
+                if (isLocked) {
+                    // Mostrar pantalla de bloqueo
+                    render(`
+                        <h1>SafeActive</h1>
+                        <div style="text-align:center; margin: 40px 0;">
+                            <div style="font-size: 3rem; margin-bottom: 20px;">🔒</div>
+                            <h2>Contenido bloqueado</h2>
+                            <p class="message">Este archivo o texto está protegido por un bloqueo temporal.</p>
+                            ${data.unlockAt === null ? 
+                                '<p>Este bloqueo es <strong>permanente</strong> y nunca se desbloqueará.</p>' :
+                                `<p>Se desbloqueará el <strong>${unlockTimeStr}</strong></p>
+                                 <div class="timer" id="countdown"></div>`
+                            }
+                        </div>
+                    `);
+
+                    if (data.unlockAt) {
+                        // Iniciar cuenta regresiva
+                        const unlockDate = data.unlockAt.toDate();
+                        const timerEl = document.getElementById('countdown');
+                        function updateTimer() {
+                            const now = new Date();
+                            const diff = unlockDate - now;
+                            if (diff <= 0) {
+                                timerEl.textContent = '¡Desbloqueado!';
+                                location.reload(); // recargar para mostrar contenido
+                                return;
+                            }
+                            const h = Math.floor(diff / 3600000);
+                            const m = Math.floor((diff % 3600000) / 60000);
+                            const s = Math.floor((diff % 60000) / 1000);
+                            timerEl.textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                        }
+                        updateTimer();
+                        setInterval(updateTimer, 1000);
+                    }
+                } else {
+                    // Contenido desbloqueado: mostrar archivo o texto
+                    if (data.type === 'file') {
+                        render(`
+                            <h1>SafeActive</h1>
+                            <div style="text-align:center;">
+                                <p>El archivo ha sido desbloqueado.</p>
+                                <p><strong>${data.fileName || 'Archivo'}</strong></p>
+                                <a href="${data.contentUrl}" download class="option-btn" style="display:inline-block; width:auto; margin-top:20px;">📥 Descargar archivo</a>
+                            </div>
+                        `);
+                    } else {
+                        render(`
+                            <h1>SafeActive</h1>
+                            <div class="card">
+                                <p style="white-space:pre-wrap;">${data.contentText}</p>
+                            </div>
+                        `);
+                    }
+                }
+            } catch (error) {
+                render(`<h1>SafeActive</h1><div class="message">Error al cargar el bloqueo: ${error.message}</div>`);
+            }
+        }
+
+        // Router
+        function handleRoute() {
+            const path = window.location.pathname;
+            const match = path.match(/^\/safeactive\/([^/]+)\/official$/);
+            if (match) {
+                const blockId = match[1];
+                showBlockView(blockId);
+            } else {
+                // Estado de autenticación
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        showDashboard();
+                    } else {
+                        showAuth();
+                    }
+                });
+            }
+        }
+
+        // Iniciar
+        handleRoute();
+    </script>
+</body>
+</html>
