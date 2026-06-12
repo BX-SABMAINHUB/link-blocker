@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SafeActive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,866 +16,864 @@
       --text:     #e0e0e0;
       --muted:    #a0a0a0;
       --gold:     #c9a84c;
-      --gold-dim: #a07a30;
-      --red:      #c0392b;
+      --gold-dim: #a0852d;
+      --danger:   #c04a4a;
       --radius:   10px;
       --max:      520px;
     }
 
-    body {
+    html, body {
+      min-height: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: 'Inter', system-ui, sans-serif;
       font-size: 15px;
       line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    #app {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: flex-start;
+      padding: 40px 16px 80px;
     }
-
-    /* ── Topbar ── */
-    #topbar {
-      width: 100%;
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      background: var(--bg);
-      z-index: 10;
-    }
-    #topbar .logo {
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 18px;
-      font-weight: bold;
-      color: var(--gold);
-      letter-spacing: 0.04em;
-    }
-    #topbar .logo span { color: var(--muted); font-weight: normal; }
-    #btn-signout {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 13px;
-      padding: 5px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-family: Georgia, serif;
-      transition: border-color .2s, color .2s;
-    }
-    #btn-signout:hover { border-color: var(--gold-dim); color: var(--text); }
-
-    /* ── Pages ── */
-    .page { display: none; width: 100%; max-width: var(--max); padding: 40px 24px 60px; }
-    .page.active { display: block; }
-
-    /* ── Auth ── */
-    #page-auth { margin: 0 auto; }
-    .auth-logo {
-      text-align: center;
-      margin-bottom: 36px;
-    }
-    .auth-logo h1 {
-      font-family: Georgia, serif;
-      font-size: 32px;
-      color: var(--gold);
-      letter-spacing: 0.06em;
-    }
-    .auth-logo p { color: var(--muted); font-size: 13px; margin-top: 6px; }
 
     .card {
+      width: 100%;
+      max-width: var(--max);
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px;
+      border-radius: 12px;
+      padding: 36px 32px;
     }
 
-    .card h2 {
-      font-family: Georgia, serif;
-      font-size: 18px;
+    /* ── Brand ── */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .brand-icon {
+      width: 32px; height: 32px;
+      background: var(--gold);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .brand-name {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 20px;
       font-weight: normal;
+      letter-spacing: 0.04em;
       color: var(--text);
-      margin-bottom: 22px;
     }
+    .brand-name span { color: var(--gold); }
 
+    /* ── Typography ── */
+    h1, h2, h3, .serif {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-weight: normal;
+    }
+    h2 { font-size: 22px; color: var(--text); margin-bottom: 6px; }
+    .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+    /* ── Form Elements ── */
     label {
       display: block;
-      font-size: 12px;
+      font-size: 13px;
+      font-weight: 500;
       color: var(--muted);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
       margin-bottom: 6px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
     }
 
     input[type="email"],
     input[type="password"],
+    input[type="number"],
     textarea,
     select {
       width: 100%;
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: var(--radius);
       color: var(--text);
-      font-size: 14px;
-      padding: 10px 14px;
-      outline: none;
-      transition: border-color .2s;
       font-family: inherit;
-    }
-    input:focus, textarea:focus, select:focus { border-color: var(--gold-dim); }
-    input::placeholder, textarea::placeholder { color: #555; }
-    textarea { resize: vertical; min-height: 120px; }
-    select option { background: var(--surface); }
-
-    .field { margin-bottom: 16px; }
-
-    .btn-primary {
-      width: 100%;
-      background: var(--gold);
-      color: #0f0f0f;
-      border: none;
-      border-radius: 8px;
-      padding: 11px;
-      font-family: Georgia, serif;
       font-size: 15px;
+      padding: 11px 14px;
+      outline: none;
+      transition: border-color 0.18s;
+      appearance: none;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--gold-dim);
+    }
+    textarea { resize: vertical; min-height: 120px; }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a0a0a0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 38px;
       cursor: pointer;
-      font-weight: bold;
-      letter-spacing: 0.03em;
-      transition: background .2s, opacity .2s;
-      display: flex;
+    }
+
+    .field { margin-bottom: 20px; }
+    .field:last-of-type { margin-bottom: 0; }
+
+    /* ── Buttons ── */
+    .btn {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      transition: opacity 0.15s, transform 0.1s;
+      padding: 12px 22px;
+      user-select: none;
     }
-    .btn-primary:hover { background: #d4b060; }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+    .btn-primary {
+      background: var(--gold);
+      color: #0f0f0f;
+      width: 100%;
+      padding: 13px;
+      font-size: 16px;
+      margin-top: 24px;
+    }
+    .btn-primary:hover:not(:disabled) { opacity: 0.88; }
 
     .btn-ghost {
-      background: none;
+      background: transparent;
+      color: var(--muted);
       border: 1px solid var(--border);
-      color: var(--muted);
-      border-radius: 8px;
-      padding: 10px 16px;
-      cursor: pointer;
-      font-family: inherit;
       font-size: 14px;
-      transition: border-color .2s, color .2s;
+      padding: 9px 16px;
     }
-    .btn-ghost:hover { border-color: var(--gold-dim); color: var(--text); }
+    .btn-ghost:hover { color: var(--text); border-color: #444; }
 
-    .auth-toggle {
-      margin-top: 18px;
-      text-align: center;
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid #3a1f1f;
       font-size: 13px;
-      color: var(--muted);
-    }
-    .auth-toggle a { color: var(--gold); cursor: pointer; text-decoration: none; }
-    .auth-toggle a:hover { text-decoration: underline; }
-
-    .error-msg {
-      background: rgba(192,57,43,.15);
-      border: 1px solid rgba(192,57,43,.4);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 13px;
-      color: #e07060;
-      margin-bottom: 14px;
+      padding: 8px 14px;
     }
 
-    /* ── Dashboard ── */
-    #page-dash { margin: 0 auto; }
-    .dash-header { margin-bottom: 28px; }
-    .dash-header h2 {
-      font-family: Georgia, serif;
-      font-size: 22px;
-      font-weight: normal;
-      color: var(--text);
-    }
-    .dash-header p { color: var(--muted); font-size: 13px; margin-top: 4px; }
-
-    .type-grid {
+    /* ── Option Cards (file / text) ── */
+    .option-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 14px;
       margin-bottom: 28px;
     }
-    .type-btn {
-      background: var(--surface);
+    .option-card {
+      background: var(--bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 22px 16px;
-      cursor: pointer;
       text-align: center;
-      transition: border-color .2s, background .2s;
-      color: var(--text);
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s;
     }
-    .type-btn:hover, .type-btn.active {
-      border-color: var(--gold-dim);
-      background: #1e1c14;
-    }
-    .type-btn .icon { font-size: 26px; display: block; margin-bottom: 8px; }
-    .type-btn .label {
+    .option-card:hover { border-color: var(--gold-dim); background: #141414; }
+    .option-card .opt-icon { font-size: 26px; margin-bottom: 8px; }
+    .option-card .opt-label {
       font-family: Georgia, serif;
       font-size: 14px;
       color: var(--text);
     }
-    .type-btn .sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
 
-    #form-area { display: none; }
-    #form-area.visible { display: block; }
-
-    /* file drop zone */
-    .drop-zone {
-      border: 2px dashed var(--border);
+    /* ── File Input ── */
+    .file-drop {
+      border: 1.5px dashed var(--border);
       border-radius: var(--radius);
       padding: 28px 20px;
       text-align: center;
       cursor: pointer;
-      transition: border-color .2s;
+      transition: border-color 0.18s;
       position: relative;
     }
-    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--gold-dim); }
-    .drop-zone input[type="file"] {
-      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    .file-drop:hover, .file-drop.has-file { border-color: var(--gold-dim); }
+    .file-drop input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+      width: 100%; height: 100%;
     }
-    .drop-zone .dz-icon { font-size: 28px; display: block; margin-bottom: 8px; }
-    .drop-zone .dz-text { color: var(--muted); font-size: 13px; }
-    .drop-zone .dz-chosen { color: var(--gold); font-size: 13px; font-weight: 500; }
+    .file-drop .drop-icon { font-size: 28px; margin-bottom: 8px; color: var(--muted); }
+    .file-drop .drop-label { color: var(--muted); font-size: 14px; }
+    .file-drop .drop-filename { color: var(--gold); font-size: 14px; margin-top: 4px; font-weight: 500; }
 
-    .progress-bar {
-      height: 3px;
+    /* ── Divider ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      margin: 20px 0;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
       background: var(--border);
-      border-radius: 2px;
-      margin: 12px 0 0;
-      overflow: hidden;
-      display: none;
-    }
-    .progress-bar.visible { display: block; }
-    .progress-fill {
-      height: 100%;
-      background: var(--gold);
-      width: 0%;
-      transition: width .2s;
     }
 
-    /* spinner */
+    /* ── Alert / Error ── */
+    .alert {
+      background: #1f1010;
+      border: 1px solid #3a1a1a;
+      border-radius: var(--radius);
+      color: #e07070;
+      font-size: 14px;
+      padding: 12px 16px;
+      margin-top: 14px;
+    }
+    .alert-success {
+      background: #0f1a0f;
+      border-color: #1a3a1a;
+      color: #70c070;
+    }
+
+    /* ── Spinner ── */
     .spinner {
-      width: 18px; height: 18px;
-      border: 2px solid rgba(0,0,0,.3);
-      border-top-color: #0f0f0f;
+      width: 20px; height: 20px;
+      border: 2px solid #3a3a3a;
+      border-top-color: var(--gold);
       border-radius: 50%;
-      animation: spin .7s linear infinite;
-      display: inline-block;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* result box */
-    .result-box {
-      background: #141a0e;
-      border: 1px solid #3a4a20;
+    /* ── Link result ── */
+    .link-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 20px;
-      margin-top: 20px;
-      display: none;
-    }
-    .result-box.visible { display: block; }
-    .result-box .rb-label { font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
-    .result-box .rb-link {
+      padding: 14px 16px;
       font-size: 13px;
       color: var(--gold);
       word-break: break-all;
-      display: block;
-      margin-bottom: 12px;
-    }
-    .result-box .rb-copy {
-      background: none;
-      border: 1px solid #3a4a20;
-      border-radius: 6px;
-      color: #a0c060;
-      font-size: 12px;
-      padding: 5px 14px;
       cursor: pointer;
-      font-family: inherit;
-      transition: background .2s;
+      transition: border-color 0.18s;
+      margin-top: 16px;
     }
-    .result-box .rb-copy:hover { background: rgba(100,160,40,.1); }
+    .link-box:hover { border-color: var(--gold-dim); }
+    .link-hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
 
-    /* ── Public page ── */
-    #page-public { margin: 0 auto; }
-    .pub-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 36px 28px;
+    /* ── Public page – lock ── */
+    .lock-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
+      padding: 10px 0 4px;
     }
-    .lock-icon { font-size: 52px; display: block; margin-bottom: 18px; }
-    .pub-card h1 {
+    .lock-icon {
+      font-size: 56px;
+      margin-bottom: 20px;
+      animation: lockPulse 2.4s ease-in-out infinite;
+      filter: drop-shadow(0 0 14px #c9a84c55);
+    }
+    @keyframes lockPulse {
+      0%, 100% { filter: drop-shadow(0 0 10px #c9a84c44); }
+      50%       { filter: drop-shadow(0 0 24px #c9a84c99); }
+    }
+    .lock-title {
       font-family: Georgia, serif;
-      font-size: 20px;
-      font-weight: normal;
-      color: var(--text);
+      font-size: 24px;
       margin-bottom: 8px;
     }
-    .pub-card .pub-sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
-    .countdown {
-      font-family: Georgia, serif;
-      font-size: 36px;
-      color: var(--gold);
-      letter-spacing: 0.08em;
-      margin: 8px 0 4px;
-    }
-    .unlock-at { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .lock-sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
 
-    .content-text {
+    .countdown {
+      font-family: 'Courier New', monospace;
+      font-size: 34px;
+      color: var(--gold);
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+    .countdown-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .unlock-date {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 16px;
+      padding: 10px 16px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    /* unlocked content */
+    .unlocked-text {
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 18px;
-      text-align: left;
+      border-radius: var(--radius);
+      padding: 20px;
       white-space: pre-wrap;
       font-size: 14px;
-      line-height: 1.7;
       color: var(--text);
-      max-height: 340px;
-      overflow-y: auto;
-      margin: 16px 0;
+      line-height: 1.7;
+      margin-top: 20px;
+      text-align: left;
     }
-
-    .file-download {
+    .download-btn {
       display: inline-flex;
       align-items: center;
       gap: 10px;
       background: var(--gold);
       color: #0f0f0f;
-      padding: 11px 22px;
-      border-radius: 8px;
-      text-decoration: none;
       font-family: Georgia, serif;
-      font-size: 14px;
-      font-weight: bold;
-      margin-top: 16px;
-      transition: background .2s;
-    }
-    .file-download:hover { background: #d4b060; }
-
-    .pub-error { color: #e07060; font-size: 14px; margin-top: 12px; }
-
-    hr.sep {
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      padding: 12px 24px;
+      border-radius: var(--radius);
       border: none;
-      border-top: 1px solid var(--border);
-      margin: 20px 0;
+      cursor: pointer;
+      text-decoration: none;
+      margin-top: 20px;
+      transition: opacity 0.15s;
+    }
+    .download-btn:hover { opacity: 0.85; }
+
+    /* ── Nav bar ── */
+    .nav {
+      width: 100%;
+      max-width: var(--max);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
     }
 
-    .permanent-badge {
-      display: inline-block;
-      background: rgba(201,168,76,.12);
-      border: 1px solid rgba(201,168,76,.3);
-      color: var(--gold);
-      font-size: 12px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      margin-top: 8px;
-      letter-spacing: .04em;
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 10px; margin-bottom: 26px; }
+    .tab {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 13px;
+      padding: 7px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab.active {
+      background: var(--gold);
+      color: #0f0f0f;
+      border-color: var(--gold);
+      font-weight: 600;
     }
 
-    /* Loading overlay */
-    #loading-overlay {
-      position: fixed; inset: 0;
-      background: var(--bg);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 100;
-      transition: opacity .4s;
-    }
-    #loading-overlay.hidden { opacity: 0; pointer-events: none; }
-    .loading-logo {
-      font-family: Georgia, serif;
-      font-size: 28px;
-      color: var(--gold);
-      letter-spacing: .08em;
-    }
+    /* ── Utility ── */
+    .hidden { display: none !important; }
+    .mt8 { margin-top: 8px; }
+    .mt16 { margin-top: 16px; }
+    .mt24 { margin-top: 24px; }
+    .flex-row { display: flex; gap: 10px; align-items: center; }
+    .flex-end { justify-content: flex-end; }
+    .text-center { text-align: center; }
 
     @media (max-width: 480px) {
-      .type-grid { grid-template-columns: 1fr; }
-      .pub-card { padding: 28px 18px; }
+      .card { padding: 28px 20px; }
+      .option-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .countdown { font-size: 28px; }
     }
   </style>
 </head>
 <body>
+<div id="app"><!-- rendered by JS --></div>
 
-<!-- Loading -->
-<div id="loading-overlay"><div class="loading-logo">SafeActive</div></div>
-
-<!-- Topbar -->
-<div id="topbar" style="display:none">
-  <div class="logo">Safe<span>Active</span></div>
-  <button id="btn-signout">Cerrar sesión</button>
-</div>
-
-<!-- Auth -->
-<div id="page-auth" class="page">
-  <div class="auth-logo">
-    <h1>SafeActive</h1>
-    <p>Bloquea contenido. Controla el tiempo.</p>
-  </div>
-  <div class="card">
-    <h2 id="auth-title">Iniciar sesión</h2>
-    <div id="auth-error" class="error-msg" style="display:none"></div>
-    <div class="field"><label>Correo electrónico</label><input type="email" id="inp-email" placeholder="tu@correo.com" /></div>
-    <div class="field"><label>Contraseña</label><input type="password" id="inp-pass" placeholder="••••••••" /></div>
-    <button class="btn-primary" id="btn-auth-submit">Iniciar sesión</button>
-    <div class="auth-toggle">
-      <span id="auth-toggle-text">¿No tienes cuenta?</span>
-      <a id="auth-toggle-link">Crear cuenta</a>
-    </div>
-  </div>
-</div>
-
-<!-- Dashboard -->
-<div id="page-dash" class="page">
-  <div class="dash-header">
-    <h2>Nuevo bloqueo</h2>
-    <p>Elige qué tipo de contenido deseas proteger.</p>
-  </div>
-
-  <div class="type-grid">
-    <div class="type-btn" id="type-file" onclick="selectType('file')">
-      <span class="icon">📁</span>
-      <div class="label">Archivo</div>
-      <div class="sub">Imagen, PDF, video…</div>
-    </div>
-    <div class="type-btn" id="type-text" onclick="selectType('text')">
-      <span class="icon">📝</span>
-      <div class="label">Texto</div>
-      <div class="sub">Mensaje, nota…</div>
-    </div>
-  </div>
-
-  <div id="form-area">
-    <div class="card">
-      <!-- File area -->
-      <div id="area-file" style="display:none">
-        <div class="field">
-          <label>Archivo</label>
-          <div class="drop-zone" id="drop-zone">
-            <input type="file" id="inp-file" />
-            <span class="dz-icon">☁️</span>
-            <div class="dz-text" id="dz-text">Haz clic o arrastra un archivo aquí</div>
-          </div>
-          <div class="progress-bar" id="prog-bar"><div class="progress-fill" id="prog-fill"></div></div>
-        </div>
-      </div>
-
-      <!-- Text area -->
-      <div id="area-text" style="display:none">
-        <div class="field">
-          <label>Contenido</label>
-          <textarea id="inp-text" placeholder="Escribe el contenido que deseas bloquear…"></textarea>
-        </div>
-      </div>
-
-      <!-- Duration -->
-      <div class="field">
-        <label>Duración del bloqueo</label>
-        <select id="inp-duration">
-          <option value="forever">Para siempre</option>
-          <option value="10">10 minutos</option>
-          <option value="60">1 hora</option>
-          <option value="120">2 horas</option>
-          <option value="360">6 horas</option>
-          <option value="720">12 horas</option>
-          <option value="1440">1 día</option>
-          <option value="custom">Personalizado…</option>
-        </select>
-      </div>
-      <div class="field" id="custom-min-field" style="display:none">
-        <label>Minutos personalizados</label>
-        <input type="number" id="inp-custom-min" placeholder="ej. 30" min="1" />
-      </div>
-
-      <div id="create-error" class="error-msg" style="display:none"></div>
-      <button class="btn-primary" id="btn-create">Crear bloqueo</button>
-
-      <div class="result-box" id="result-box">
-        <div class="rb-label">Enlace generado</div>
-        <a class="rb-link" id="rb-link" href="#" target="_blank"></a>
-        <button class="rb-copy" id="rb-copy">Copiar enlace</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Public view -->
-<div id="page-public" class="page">
-  <div style="text-align:center; margin-bottom: 20px;">
-    <div class="loading-logo" style="font-size:20px">SafeActive</div>
-  </div>
-  <div class="pub-card" id="pub-card">
-    <span class="lock-icon">🔒</span>
-    <h1 id="pub-title">Cargando…</h1>
-    <p class="pub-sub" id="pub-sub"></p>
-    <div id="pub-countdown-wrap" style="display:none">
-      <div class="countdown" id="pub-countdown">--:--:--</div>
-      <div class="unlock-at" id="pub-unlock-at"></div>
-    </div>
-    <div id="pub-content" style="display:none"></div>
-  </div>
-</div>
-
-<!-- Firebase v10 -->
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut }
-  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, doc, setDoc, getDoc, serverTimestamp, Timestamp }
-  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL }
-  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
+// ── Firebase ─────────────────────────────────────────────────────────────────
+import { initializeApp }            from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+         createUserWithEmailAndPassword, signOut }
+                                    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, collection, doc, setDoc, getDoc, serverTimestamp, Timestamp }
+                                    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL }
+                                    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
 
-// ── Firebase config ──────────────────────────────────────────────────────────
-// TODO: Replace with your Firebase project credentials
+// ── CONFIG ───────────────────────────────────────────────────────────────────
+// Reemplaza con tus credenciales de Firebase
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey:            "TU_API_KEY",
+  authDomain:        "TU_PROJECT.firebaseapp.com",
+  projectId:         "TU_PROJECT_ID",
+  storageBucket:     "TU_PROJECT.appspot.com",
+  messagingSenderId: "TU_MESSAGING_SENDER_ID",
+  appId:             "TU_APP_ID"
 };
 
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
+const app     = initializeApp(firebaseConfig);
+const auth    = getAuth(app);
+const db      = getFirestore(app);
 const storage = getStorage(app);
 
-// ── Routing ──────────────────────────────────────────────────────────────────
+// ── Router ───────────────────────────────────────────────────────────────────
 function getRoute() {
   const path = window.location.pathname;
-  const m = path.match(/^\/safeactive\/([^/]+)\/official$/);
-  return m ? { type: 'public', id: m[1] } : { type: 'app' };
+  const m    = path.match(/^\/safeactive\/([^/]+)\/official$/);
+  if (m) return { view: 'public', blockId: m[1] };
+  return { view: 'app' };
 }
 
+// ── Main ─────────────────────────────────────────────────────────────────────
 const route = getRoute();
-const overlay = document.getElementById('loading-overlay');
 
-// ── Auth state ───────────────────────────────────────────────────────────────
-onAuthStateChanged(auth, user => {
-  overlay.classList.add('hidden');
-  setTimeout(() => overlay.style.display = 'none', 400);
+if (route.view === 'public') {
+  renderPublic(route.blockId);
+} else {
+  onAuthStateChanged(auth, user => {
+    user ? renderDashboard(user) : renderAuth();
+  });
+}
 
-  if (route.type === 'public') {
-    showPage('page-public');
-    loadPublicBlock(route.id);
+// ═══════════════════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════════════════
+function renderAuth() {
+  const el = document.getElementById('app');
+  el.innerHTML = `
+    <div class="brand" style="margin-top:8px">
+      <div class="brand-icon">🔒</div>
+      <div class="brand-name">Safe<span>Active</span></div>
+    </div>
+    <div class="card">
+      <div class="tabs">
+        <button class="tab active" data-tab="login">Iniciar sesión</button>
+        <button class="tab" data-tab="register">Crear cuenta</button>
+      </div>
+
+      <div id="tab-login">
+        <div class="field">
+          <label>Correo electrónico</label>
+          <input id="login-email" type="email" placeholder="tu@email.com" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <input id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <button class="btn btn-primary" id="login-btn">Iniciar sesión</button>
+        <div id="login-err"></div>
+      </div>
+
+      <div id="tab-register" class="hidden">
+        <div class="field">
+          <label>Correo electrónico</label>
+          <input id="reg-email" type="email" placeholder="tu@email.com" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <input id="reg-pass" type="password" placeholder="Mín. 6 caracteres" autocomplete="new-password" />
+        </div>
+        <button class="btn btn-primary" id="reg-btn">Crear cuenta</button>
+        <div id="reg-err"></div>
+      </div>
+    </div>
+  `;
+
+  // Tabs
+  el.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      el.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      el.querySelector('#tab-login').classList.toggle('hidden', t.dataset.tab !== 'login');
+      el.querySelector('#tab-register').classList.toggle('hidden', t.dataset.tab !== 'register');
+    });
+  });
+
+  // Login
+  el.querySelector('#login-btn').addEventListener('click', async () => {
+    const email = el.querySelector('#login-email').value.trim();
+    const pass  = el.querySelector('#login-pass').value;
+    const errEl = el.querySelector('#login-err');
+    setLoading('#login-btn', true);
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } catch(e) {
+      errEl.innerHTML = `<div class="alert">${friendlyError(e.code)}</div>`;
+      setLoading('#login-btn', false);
+    }
+  });
+
+  // Register
+  el.querySelector('#reg-btn').addEventListener('click', async () => {
+    const email = el.querySelector('#reg-email').value.trim();
+    const pass  = el.querySelector('#reg-pass').value;
+    const errEl = el.querySelector('#reg-err');
+    setLoading('#reg-btn', true);
+    try {
+      await createUserWithEmailAndPassword(auth, email, pass);
+    } catch(e) {
+      errEl.innerHTML = `<div class="alert">${friendlyError(e.code)}</div>`;
+      setLoading('#reg-btn', false);
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════════════════════
+function renderDashboard(user) {
+  const el = document.getElementById('app');
+  el.innerHTML = `
+    <div class="nav">
+      <div class="brand">
+        <div class="brand-icon">🔒</div>
+        <div class="brand-name">Safe<span>Active</span></div>
+      </div>
+      <button class="btn btn-ghost" id="logout-btn">Cerrar sesión</button>
+    </div>
+    <div class="card">
+      <h2>Nuevo bloqueo</h2>
+      <p class="subtitle">Elige qué deseas bloquear</p>
+      <div class="option-grid">
+        <div class="option-card" id="opt-file">
+          <div class="opt-icon">📁</div>
+          <div class="opt-label">Archivo</div>
+        </div>
+        <div class="option-card" id="opt-text">
+          <div class="opt-icon">📝</div>
+          <div class="opt-label">Texto</div>
+        </div>
+      </div>
+      <div id="form-area"></div>
+      <div id="result-area"></div>
+    </div>
+  `;
+
+  el.querySelector('#logout-btn').addEventListener('click', () => signOut(auth));
+  el.querySelector('#opt-file').addEventListener('click', () => renderForm('file', user));
+  el.querySelector('#opt-text').addEventListener('click', () => renderForm('text', user));
+}
+
+function renderForm(type, user) {
+  const fa = document.querySelector('#form-area');
+  const ra = document.querySelector('#result-area');
+  ra.innerHTML = '';
+
+  const durationOpts = `
+    <option value="forever">Para siempre</option>
+    <option value="10">10 minutos</option>
+    <option value="60">1 hora</option>
+    <option value="120">2 horas</option>
+    <option value="360">6 horas</option>
+    <option value="720">12 horas</option>
+    <option value="1440">1 día</option>
+    <option value="custom">Personalizado</option>
+  `;
+
+  const contentField = type === 'file'
+    ? `<div class="field" id="file-field">
+         <label>Archivo</label>
+         <div class="file-drop" id="file-drop">
+           <input type="file" id="file-input" />
+           <div class="drop-icon">📎</div>
+           <div class="drop-label">Toca para seleccionar un archivo</div>
+           <div class="drop-filename hidden" id="drop-fname"></div>
+         </div>
+       </div>`
+    : `<div class="field">
+         <label>Contenido</label>
+         <textarea id="text-content" placeholder="Escribe el contenido que deseas bloquear…"></textarea>
+       </div>`;
+
+  fa.innerHTML = `
+    ${contentField}
+    <div class="field mt16">
+      <label>Duración del bloqueo</label>
+      <select id="duration-sel">${durationOpts}</select>
+    </div>
+    <div class="field hidden" id="custom-field">
+      <label>Minutos personalizados</label>
+      <input type="number" id="custom-min" min="1" placeholder="Ej. 45" />
+    </div>
+    <button class="btn btn-primary" id="create-btn">Crear bloqueo</button>
+    <div id="form-err"></div>
+  `;
+
+  // File name preview
+  if (type === 'file') {
+    document.querySelector('#file-input').addEventListener('change', e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      const drop  = document.querySelector('#file-drop');
+      const fname = document.querySelector('#drop-fname');
+      drop.classList.add('has-file');
+      fname.textContent = f.name;
+      fname.classList.remove('hidden');
+      document.querySelector('.drop-label').textContent = 'Archivo seleccionado';
+    });
+  }
+
+  // Custom duration toggle
+  document.querySelector('#duration-sel').addEventListener('change', e => {
+    document.querySelector('#custom-field').classList.toggle('hidden', e.target.value !== 'custom');
+  });
+
+  // Create
+  document.querySelector('#create-btn').addEventListener('click', () => createBlock(type, user));
+}
+
+async function createBlock(type, user) {
+  const errEl = document.querySelector('#form-err');
+  errEl.innerHTML = '';
+  const durSel = document.querySelector('#duration-sel').value;
+
+  let unlockAt = null;
+  if (durSel !== 'forever') {
+    let mins = durSel === 'custom'
+      ? parseInt(document.querySelector('#custom-min').value)
+      : parseInt(durSel);
+    if (!mins || mins < 1) {
+      errEl.innerHTML = `<div class="alert">Introduce un número de minutos válido.</div>`;
+      return;
+    }
+    unlockAt = Timestamp.fromDate(new Date(Date.now() + mins * 60 * 1000));
+  }
+
+  setLoading('#create-btn', true);
+
+  try {
+    const blockId  = crypto.randomUUID();
+    const blockRef = doc(db, 'blocks', blockId);
+    let docData = {
+      type,
+      owner:     user.uid,
+      unlockAt,
+      createdAt: serverTimestamp(),
+    };
+
+    if (type === 'file') {
+      const fileInput = document.querySelector('#file-input');
+      const file      = fileInput.files[0];
+      if (!file) {
+        errEl.innerHTML = `<div class="alert">Selecciona un archivo.</div>`;
+        setLoading('#create-btn', false);
+        return;
+      }
+      const storageRef = ref(storage, `blocks/${blockId}/${file.name}`);
+      await uploadBytesResumable(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      docData.contentUrl  = url;
+      docData.fileName    = file.name;
+    } else {
+      const text = document.querySelector('#text-content').value.trim();
+      if (!text) {
+        errEl.innerHTML = `<div class="alert">El contenido no puede estar vacío.</div>`;
+        setLoading('#create-btn', false);
+        return;
+      }
+      docData.contentText = text;
+    }
+
+    await setDoc(blockRef, docData);
+
+    const link = `${window.location.origin}/safeactive/${blockId}/official`;
+    showResult(link);
+  } catch(e) {
+    errEl.innerHTML = `<div class="alert">Error al crear el bloqueo: ${e.message}</div>`;
+    setLoading('#create-btn', false);
+  }
+}
+
+function showResult(link) {
+  document.querySelector('#form-area').innerHTML = '';
+  document.querySelector('#result-area').innerHTML = `
+    <div style="text-align:center;padding:10px 0">
+      <div style="font-size:36px;margin-bottom:12px">✅</div>
+      <h3 class="serif" style="font-size:18px;margin-bottom:6px">Bloqueo creado</h3>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:4px">Tu enlace público:</p>
+      <div class="link-box" id="copy-link" title="Clic para copiar">${link}</div>
+      <p class="link-hint">Clic en el enlace para copiarlo al portapapeles</p>
+      <button class="btn btn-ghost mt24" id="new-block-btn" style="margin-top:20px">Crear otro bloqueo</button>
+    </div>
+  `;
+  document.querySelector('#copy-link').addEventListener('click', () => {
+    navigator.clipboard.writeText(link).then(() => {
+      document.querySelector('#copy-link').textContent = '¡Copiado!';
+      setTimeout(() => document.querySelector('#copy-link') && (document.querySelector('#copy-link').textContent = link), 1800);
+    });
+  });
+  document.querySelector('#new-block-btn').addEventListener('click', () => {
+    document.querySelector('#result-area').innerHTML = '';
+    document.querySelector('#form-area').innerHTML   = '';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PUBLIC PAGE
+// ═══════════════════════════════════════════════════════════════════════════
+async function renderPublic(blockId) {
+  const el = document.getElementById('app');
+  el.innerHTML = `
+    <div class="brand" style="margin-top:8px">
+      <div class="brand-icon">🔒</div>
+      <div class="brand-name">Safe<span>Active</span></div>
+    </div>
+    <div class="card" id="pub-card">
+      <div style="text-align:center;padding:20px 0">
+        <div class="spinner" style="margin:0 auto"></div>
+        <p style="color:var(--muted);margin-top:16px;font-size:14px">Verificando bloqueo…</p>
+      </div>
+    </div>
+  `;
+
+  try {
+    const snap = await getDoc(doc(db, 'blocks', blockId));
+    if (!snap.exists()) {
+      return showPubError('Este enlace no existe o ha sido eliminado.');
+    }
+    const data = snap.data();
+    renderPubState(data, blockId);
+  } catch(e) {
+    showPubError('No se pudo cargar el bloqueo. Intenta de nuevo.');
+  }
+}
+
+let countdownTimer = null;
+
+function renderPubState(data, blockId) {
+  if (countdownTimer) clearInterval(countdownTimer);
+
+  const card = document.getElementById('pub-card');
+
+  // Permanent lock
+  if (!data.unlockAt) {
+    card.innerHTML = `
+      <div class="lock-wrap">
+        <div class="lock-icon">🔒</div>
+        <h2 class="lock-title">Contenido bloqueado</h2>
+        <p class="lock-sub">Este bloqueo es permanente y nunca se desbloqueará.</p>
+        <div class="unlock-date">🔐 Bloqueo permanente</div>
+      </div>
+    `;
     return;
   }
 
-  if (user) {
-    document.getElementById('topbar').style.display = 'flex';
-    showPage('page-dash');
-  } else {
-    document.getElementById('topbar').style.display = 'none';
-    showPage('page-auth');
-  }
-});
+  const unlockMs = data.unlockAt.toDate().getTime();
 
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// ── Auth UI ──────────────────────────────────────────────────────────────────
-let authMode = 'login'; // 'login' | 'register'
-
-document.getElementById('auth-toggle-link').addEventListener('click', () => {
-  authMode = authMode === 'login' ? 'register' : 'login';
-  document.getElementById('auth-title').textContent =
-    authMode === 'login' ? 'Iniciar sesión' : 'Crear cuenta';
-  document.getElementById('btn-auth-submit').textContent =
-    authMode === 'login' ? 'Iniciar sesión' : 'Crear cuenta';
-  document.getElementById('auth-toggle-text').textContent =
-    authMode === 'login' ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?';
-  document.getElementById('auth-toggle-link').textContent =
-    authMode === 'login' ? 'Crear cuenta' : 'Iniciar sesión';
-  document.getElementById('auth-error').style.display = 'none';
-});
-
-document.getElementById('btn-auth-submit').addEventListener('click', async () => {
-  const email = document.getElementById('inp-email').value.trim();
-  const pass  = document.getElementById('inp-pass').value;
-  const errEl = document.getElementById('auth-error');
-  const btn   = document.getElementById('btn-auth-submit');
-  errEl.style.display = 'none';
-  if (!email || !pass) { showError(errEl, 'Completa todos los campos.'); return; }
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>';
-  try {
-    if (authMode === 'login') {
-      await signInWithEmailAndPassword(auth, email, pass);
-    } else {
-      await createUserWithEmailAndPassword(auth, email, pass);
-    }
-  } catch (e) {
-    btn.disabled = false;
-    btn.textContent = authMode === 'login' ? 'Iniciar sesión' : 'Crear cuenta';
-    showError(errEl, friendlyAuthError(e.code));
-  }
-});
-
-['inp-email','inp-pass'].forEach(id => {
-  document.getElementById(id).addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('btn-auth-submit').click();
-  });
-});
-
-document.getElementById('btn-signout').addEventListener('click', () => signOut(auth));
-
-function friendlyAuthError(code) {
-  const map = {
-    'auth/invalid-email': 'Correo electrónico inválido.',
-    'auth/user-not-found': 'No existe una cuenta con ese correo.',
-    'auth/wrong-password': 'Contraseña incorrecta.',
-    'auth/email-already-in-use': 'Ese correo ya tiene una cuenta.',
-    'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
-    'auth/invalid-credential': 'Credenciales incorrectas.',
-    'auth/too-many-requests': 'Demasiados intentos. Espera un momento.',
-  };
-  return map[code] || 'Error al autenticar. Inténtalo de nuevo.';
-}
-
-function showError(el, msg) { el.textContent = msg; el.style.display = 'block'; }
-
-// ── Dashboard ────────────────────────────────────────────────────────────────
-let selectedType = null;
-
-window.selectType = function(type) {
-  selectedType = type;
-  document.getElementById('type-file').classList.toggle('active', type === 'file');
-  document.getElementById('type-text').classList.toggle('active', type === 'text');
-  document.getElementById('form-area').classList.add('visible');
-  document.getElementById('area-file').style.display = type === 'file' ? 'block' : 'none';
-  document.getElementById('area-text').style.display = type === 'text' ? 'block' : 'none';
-  document.getElementById('result-box').classList.remove('visible');
-  document.getElementById('create-error').style.display = 'none';
-};
-
-// File input display
-document.getElementById('inp-file').addEventListener('change', function() {
-  const f = this.files[0];
-  if (f) document.getElementById('dz-text').textContent = f.name;
-});
-
-// Drag over
-const dz = document.getElementById('drop-zone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-dz.addEventListener('drop', e => {
-  e.preventDefault(); dz.classList.remove('drag-over');
-  const f = e.dataTransfer.files[0];
-  if (f) {
-    const dt = new DataTransfer(); dt.items.add(f);
-    document.getElementById('inp-file').files = dt.files;
-    document.getElementById('dz-text').textContent = f.name;
-  }
-});
-
-// Duration selector
-document.getElementById('inp-duration').addEventListener('change', function() {
-  document.getElementById('custom-min-field').style.display =
-    this.value === 'custom' ? 'block' : 'none';
-});
-
-// Create block
-document.getElementById('btn-create').addEventListener('click', async () => {
-  const errEl = document.getElementById('create-error');
-  errEl.style.display = 'none';
-
-  if (!selectedType) { showError(errEl, 'Selecciona un tipo de contenido.'); return; }
-
-  const durVal = document.getElementById('inp-duration').value;
-  let unlockAt = null;
-  if (durVal !== 'forever') {
-    const mins = durVal === 'custom'
-      ? parseInt(document.getElementById('inp-custom-min').value)
-      : parseInt(durVal);
-    if (!mins || mins < 1) { showError(errEl, 'Ingresa una duración válida.'); return; }
-    unlockAt = Timestamp.fromDate(new Date(Date.now() + mins * 60000));
-  }
-
-  const btn = document.getElementById('btn-create');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>';
-
-  try {
-    const user = auth.currentUser;
-    const blockId = generateId();
-
-    if (selectedType === 'text') {
-      const text = document.getElementById('inp-text').value.trim();
-      if (!text) throw new Error('Escribe algún contenido.');
-      await setDoc(doc(db, 'blocks', blockId), {
-        type: 'text',
-        owner: user.uid,
-        unlockAt,
-        createdAt: serverTimestamp(),
-        contentText: text
-      });
-    } else {
-      const file = document.getElementById('inp-file').files[0];
-      if (!file) throw new Error('Selecciona un archivo.');
-      const url = await uploadFile(blockId, file);
-      await setDoc(doc(db, 'blocks', blockId), {
-        type: 'file',
-        owner: user.uid,
-        unlockAt,
-        createdAt: serverTimestamp(),
-        contentUrl: url,
-        fileName: file.name
-      });
-    }
-
-    const link = `${window.location.origin}/safeactive/${blockId}/official`;
-    const rb = document.getElementById('result-box');
-    const rbLink = document.getElementById('rb-link');
-    rbLink.textContent = link;
-    rbLink.href = link;
-    rb.classList.add('visible');
-
-  } catch(e) {
-    showError(errEl, e.message || 'Error al crear el bloqueo.');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Crear bloqueo';
-  }
-});
-
-document.getElementById('rb-copy').addEventListener('click', () => {
-  const link = document.getElementById('rb-link').textContent;
-  navigator.clipboard.writeText(link).then(() => {
-    const btn = document.getElementById('rb-copy');
-    btn.textContent = '¡Copiado!';
-    setTimeout(() => btn.textContent = 'Copiar enlace', 2000);
-  });
-});
-
-async function uploadFile(blockId, file) {
-  return new Promise((resolve, reject) => {
-    const ref = storageRef(storage, `blocks/${blockId}/${file.name}`);
-    const task = uploadBytesResumable(ref, file);
-    const prog = document.getElementById('prog-bar');
-    const fill = document.getElementById('prog-fill');
-    prog.classList.add('visible');
-    task.on('state_changed',
-      snap => { fill.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + '%'; },
-      reject,
-      async () => { resolve(await getDownloadURL(task.snapshot.ref)); prog.classList.remove('visible'); }
-    );
-  });
-}
-
-function generateId() {
-  return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
-}
-
-// ── Public block page ────────────────────────────────────────────────────────
-let countdownInterval = null;
-
-async function loadPublicBlock(id) {
-  const titleEl    = document.getElementById('pub-title');
-  const subEl      = document.getElementById('pub-sub');
-  const cdWrap     = document.getElementById('pub-countdown-wrap');
-  const cdEl       = document.getElementById('pub-countdown');
-  const unlockAtEl = document.getElementById('pub-unlock-at');
-  const contentEl  = document.getElementById('pub-content');
-  const lockIcon   = document.querySelector('.lock-icon');
-
-  try {
-    const snap = await getDoc(doc(db, 'blocks', id));
-    if (!snap.exists()) {
-      lockIcon.textContent = '⚠️';
-      titleEl.textContent = 'Bloqueo no encontrado';
-      subEl.textContent = 'Este enlace no existe o ha sido eliminado.';
-      return;
-    }
-
-    const data = snap.data();
-    const isForever = !data.unlockAt;
-    const unlockDate = isForever ? null : data.unlockAt.toDate();
-    const now = new Date();
-    const isLocked = isForever || unlockDate > now;
-
-    if (isLocked) {
-      lockIcon.textContent = '🔒';
-      titleEl.textContent = 'Contenido bloqueado';
-      if (isForever) {
-        subEl.textContent = 'Este bloqueo es permanente y nunca se desbloqueará.';
-        const badge = document.createElement('div');
-        badge.className = 'permanent-badge';
-        badge.textContent = '🔒 Permanente';
-        document.getElementById('pub-card').appendChild(badge);
-      } else {
-        subEl.textContent = 'Este contenido está protegido hasta:';
-        cdWrap.style.display = 'block';
-        unlockAtEl.textContent = formatDate(unlockDate);
-        startCountdown(unlockDate, cdEl);
-      }
-    } else {
-      // Unlocked
-      lockIcon.textContent = '🔓';
-      titleEl.textContent = 'Contenido disponible';
-      subEl.textContent = 'El período de bloqueo ha finalizado.';
-
-      contentEl.style.display = 'block';
-      if (data.type === 'text') {
-        const box = document.createElement('div');
-        box.className = 'content-text';
-        box.textContent = data.contentText;
-        contentEl.appendChild(box);
-      } else {
-        const a = document.createElement('a');
-        a.className = 'file-download';
-        a.href = data.contentUrl;
-        a.download = data.fileName || 'archivo';
-        a.target = '_blank';
-        a.innerHTML = `📥 Descargar ${data.fileName || 'archivo'}`;
-        contentEl.appendChild(a);
-      }
-    }
-  } catch(e) {
-    lockIcon.textContent = '⚠️';
-    titleEl.textContent = 'Error al cargar';
-    subEl.textContent = e.message;
-  }
-}
-
-function startCountdown(target, el) {
-  if (countdownInterval) clearInterval(countdownInterval);
   function tick() {
-    const diff = target - new Date();
+    const now  = Date.now();
+    const diff = unlockMs - now;
+
     if (diff <= 0) {
-      clearInterval(countdownInterval);
+      // Unlocked — reload to show content
+      clearInterval(countdownTimer);
       window.location.reload();
       return;
     }
+
     const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
-    el.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+    const pad = n => String(n).padStart(2, '0');
+    const cdEl = document.getElementById('cd-display');
+    if (cdEl) cdEl.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
   }
-  tick();
-  countdownInterval = setInterval(tick, 1000);
+
+  const now    = Date.now();
+  const diff   = unlockMs - now;
+  const isLocked = diff > 0;
+
+  if (isLocked) {
+    const unlockDate = data.unlockAt.toDate().toLocaleString('es-ES', {
+      dateStyle: 'medium', timeStyle: 'short'
+    });
+    card.innerHTML = `
+      <div class="lock-wrap">
+        <div class="lock-icon">🔒</div>
+        <h2 class="lock-title">Contenido bloqueado</h2>
+        <p class="lock-sub">Este contenido estará disponible cuando expire el bloqueo.</p>
+        <div class="countdown" id="cd-display">--:--:--</div>
+        <div class="countdown-label">horas : minutos : segundos</div>
+        <div class="unlock-date">📅 Se desbloqueará el ${unlockDate}</div>
+      </div>
+    `;
+    tick();
+    countdownTimer = setInterval(tick, 1000);
+  } else {
+    // Content is unlocked
+    card.innerHTML = `
+      <div class="lock-wrap" style="margin-bottom:8px">
+        <div style="font-size:52px;margin-bottom:16px">🔓</div>
+        <h2 class="lock-title">Contenido desbloqueado</h2>
+        <p class="lock-sub">El período de bloqueo ha expirado.</p>
+      </div>
+    `;
+
+    if (data.type === 'text') {
+      const textEl = document.createElement('div');
+      textEl.className = 'unlocked-text';
+      textEl.textContent = data.contentText;
+      card.appendChild(textEl);
+    } else if (data.type === 'file') {
+      const a = document.createElement('a');
+      a.className   = 'download-btn';
+      a.href        = data.contentUrl;
+      a.target      = '_blank';
+      a.rel         = 'noopener noreferrer';
+      a.download    = data.fileName || 'archivo';
+      a.innerHTML   = `⬇ Descargar ${data.fileName || 'archivo'}`;
+      card.appendChild(a);
+    }
+  }
 }
 
-function pad(n) { return String(n).padStart(2, '0'); }
+function showPubError(msg) {
+  const card = document.getElementById('pub-card');
+  card.innerHTML = `
+    <div class="lock-wrap">
+      <div style="font-size:42px;margin-bottom:16px">⚠️</div>
+      <h2 class="lock-title" style="font-size:20px">Enlace no encontrado</h2>
+      <p class="lock-sub">${msg}</p>
+    </div>
+  `;
+}
 
-function formatDate(d) {
-  return d.toLocaleString('es-ES', {
-    year: 'numeric', month: 'long', day: 'numeric',
-    hour: '2-digit', minute: '2-digit'
-  });
+// ═══════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+function setLoading(selector, loading) {
+  const btn = document.querySelector(selector);
+  if (!btn) return;
+  if (loading) {
+    btn._origText = btn.innerHTML;
+    btn.disabled  = true;
+    btn.innerHTML = `<div class="spinner"></div>`;
+  } else {
+    btn.disabled  = false;
+    btn.innerHTML = btn._origText || btn.innerHTML;
+  }
+}
+
+function friendlyError(code) {
+  const map = {
+    'auth/user-not-found':       'No existe una cuenta con ese correo.',
+    'auth/wrong-password':       'Contraseña incorrecta.',
+    'auth/invalid-email':        'El correo electrónico no es válido.',
+    'auth/email-already-in-use': 'Ya existe una cuenta con ese correo.',
+    'auth/weak-password':        'La contraseña debe tener al menos 6 caracteres.',
+    'auth/too-many-requests':    'Demasiados intentos. Espera unos minutos.',
+    'auth/invalid-credential':   'Credenciales inválidas. Verifica tu correo y contraseña.',
+  };
+  return map[code] || 'Ocurrió un error. Inténtalo de nuevo.';
 }
 </script>
 </body>
